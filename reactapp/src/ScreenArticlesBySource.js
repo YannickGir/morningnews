@@ -30,6 +30,18 @@ function ScreenArticlesBySource(props) {
     findArticles();
   }, []);
 
+  const addArticle = async (article) => {
+    //------------envoi au store----------------
+    props.addToWishList(article);
+
+    //-----------------------envoi en BDD----------------------
+    const data = await fetch("/add-article", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `tokenFromFront=${props.token}&titleFromFront=${article.title}&descriptionFromFront=${article.description}&contentFromFront=${article.content}&imageFromFront=${article.image}&languageFromFront${article.language}`,
+    });
+  };
+
   var showModal = (title, content) => {
     setVisible(true);
     setTitle(title);
@@ -74,7 +86,7 @@ function ScreenArticlesBySource(props) {
                   type="like"
                   key="ellipsis"
                   onClick={() => {
-                    props.addToWishList(article);
+                    addArticle(article);
                   }}
                 />,
               ]}
@@ -96,13 +108,19 @@ function ScreenArticlesBySource(props) {
   );
 }
 
+function mapStateToProps(state) {
+  return { token: state.token };
+}
+
 function mapDispatchToProps(dispatch) {
   return {
     addToWishList: function (article) {
       dispatch({ type: "addArticle", articleLiked: article }); // ajout dans wih front et envoi au store
-      //envoi en BDD par la route en GET
     },
   };
 }
 
-export default connect(null, mapDispatchToProps)(ScreenArticlesBySource);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ScreenArticlesBySource);

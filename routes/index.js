@@ -1,14 +1,14 @@
-var express = require('express');
+var express = require("express");
 var router = express.Router();
 
-var uid2 = require('uid2');
-var bcrypt = require('bcrypt');
+var uid2 = require("uid2");
+var bcrypt = require("bcrypt");
 
-var userModel = require('../models/users');
-var articleModel = require('../models/articles');
+var userModel = require("../models/users");
+var ArticleModel = require("../models/articles");
 
-router.post('/sign-up', async function (req, res, next) {
-  console.log('je suis Yannick');
+router.post("/sign-up", async function (req, res, next) {
+  console.log("je suis Yannick");
   var error = [];
   var result = false;
   var saveUser = null;
@@ -19,15 +19,15 @@ router.post('/sign-up', async function (req, res, next) {
   });
 
   if (data != null) {
-    error.push('utilisateur déjà présent');
+    error.push("utilisateur déjà présent");
   }
 
   if (
-    req.body.usernameFromFront == '' ||
-    req.body.emailFromFront == '' ||
-    req.body.passwordFromFront == ''
+    req.body.usernameFromFront == "" ||
+    req.body.emailFromFront == "" ||
+    req.body.passwordFromFront == ""
   ) {
-    error.push('champs vides');
+    error.push("champs vides");
   }
 
   if (error.length == 0) {
@@ -37,7 +37,7 @@ router.post('/sign-up', async function (req, res, next) {
       email: req.body.emailFromFront,
       password: hash,
       token: uid2(32),
-      language: 'fr',
+      language: "fr",
     });
 
     saveUser = await newUser.save();
@@ -51,14 +51,14 @@ router.post('/sign-up', async function (req, res, next) {
   res.json({ result, saveUser, error, token });
 });
 
-router.post('/sign-in', async function (req, res, next) {
+router.post("/sign-in", async function (req, res, next) {
   var result = false;
   var user = null;
   var error = [];
   var token = null;
 
-  if (req.body.emailFromFront == '' || req.body.passwordFromFront == '') {
-    error.push('champs vides');
+  if (req.body.emailFromFront == "" || req.body.passwordFromFront == "") {
+    error.push("champs vides");
   }
 
   if (error.length == 0) {
@@ -72,10 +72,10 @@ router.post('/sign-in', async function (req, res, next) {
         token = user.token;
       } else {
         result = false;
-        error.push('mot de passe incorrect');
+        error.push("mot de passe incorrect");
       }
     } else {
-      error.push('email incorrect');
+      error.push("email incorrect");
     }
   }
 
@@ -83,51 +83,49 @@ router.post('/sign-in', async function (req, res, next) {
 });
 
 //---------------ROUTE EN GET POUR SAUV EN BDD MY ARTICLES DEPUIS SCREENARTICLESBYSOURCE-----------------------
-router.get("/screenMyarticles", async function (req, res, next) {
+// router.post("/add-article", async function (req, res, next) {
+// console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
+
+// console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+
+// var user = await userModel.findById(userID).populate("userJourneys").exec();
+//  console.log("req.session.userSaved.userJourneys", user.userJourneys)
+
+//   res.render("screenMyarticles", { userJourneys: user.userJourneys });
+// });
+
+//---------------ROUTE EN POST SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
+router.post("/add-article", async function (req, res, next) {
+  console.log(req.body);
+  var newUserArticle = new ArticleModel({
+    title: req.body.titleFromFront,
+    description: req.body.descriptionFromFront,
+    content: req.body.contentFromFront,
+    urlToImage: req.body.imageFromFront,
+    language: req.body.languageFromFront,
+  });
+
+  var userArticlesSaved = await newUserArticle.save();
   // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
 
   // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
 
-  var user = await userModel.findById(userID).populate("userJourneys").exec();
+  // var user = await userModel.findById(userID).populate("userJourneys").exec();
   //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
 
-  res.render("screenMyarticles", { userJourneys: user.userJourneys });
-});
-
-//---------------ROUTE EN GET SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
-router.get("/screenMyarticles", async function (req, res, next) {
-  var newUserJourney = new journeyModel([
-    {
-      _id: req.session.journeyticketsArray[i].id,
-      departure: req.session.journeyticketsArray[i].departure,
-      arrival: req.session.journeyticketsArray[i].arrival,
-      date: req.session.journeyticketsArray[i].date,
-      departureTime: req.session.journeyticketsArray[i].departureTime,
-      price: req.session.journeyticketsArray[i].price,
-    },
-  ]);
-
-  var userArticlesSaved = await newUserJourney.save();
-  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
-
-  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
-
-  var user = await userModel.findById(userID).populate("userJourneys").exec();
-  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
-
-  res.render("screenMyarticles", { userJourneys: user.userJourneys });
+  res.json(userArticlesSaved);
 });
 
 //---------------ROUTE VOIR TOUS LES ARTICLES EN GET SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
-router.get("/screenMyarticles", async function (req, res, next) {
-  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
+// router.get("/screenMyarticles", async function (req, res, next) {
+// console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
 
-  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+// console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
 
-  var user = await userModel.findById(userID).populate("userJourneys").exec();
-  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
+// var user = await userModel.findById(userID).populate("userJourneys").exec();
+//  console.log("req.session.userSaved.userJourneys", user.userJourneys)
 
-  res.render("screenMyarticles", { userJourneys: user.userJourneys });
-});
+// res.render("screenMyarticles", { userJourneys: user.userJourneys });
+// });
 
 module.exports = router;
