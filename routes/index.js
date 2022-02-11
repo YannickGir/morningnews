@@ -4,8 +4,13 @@ var router = express.Router();
 var uid2 = require("uid2");
 var bcrypt = require("bcrypt");
 
+<<<<<<< HEAD
 var userModel = require("../models/users");
 var ArticleModel = require("../models/articles");
+=======
+var userModel = require('../models/users');
+var ArticleModel = require('../models/articles');
+>>>>>>> f825168ee87b3930afb3e25a5c86f887719e455e
 
 router.post("/sign-up", async function (req, res, next) {
   console.log("je suis Yannick");
@@ -82,21 +87,8 @@ router.post("/sign-in", async function (req, res, next) {
   res.json({ result, user, error, token });
 });
 
-//---------------ROUTE EN GET POUR SAUV EN BDD MY ARTICLES DEPUIS SCREENARTICLESBYSOURCE-----------------------
-// router.post("/add-article", async function (req, res, next) {
-// console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
-
-// console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
-
-// var user = await userModel.findById(userID).populate("userJourneys").exec();
-//  console.log("req.session.userSaved.userJourneys", user.userJourneys)
-
-//   res.render("screenMyarticles", { userJourneys: user.userJourneys });
-// });
-
-//---------------ROUTE EN POST SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
-router.post("/add-article", async function (req, res, next) {
-  console.log(req.body);
+//---------------ROUTE EN POST EN BDD DEPUIS SCREENARTICLESBYSOURCE-----------------------
+router.post('/add-article', async function (req, res, next) {
   var newUserArticle = new ArticleModel({
     title: req.body.titleFromFront,
     description: req.body.descriptionFromFront,
@@ -106,26 +98,32 @@ router.post("/add-article", async function (req, res, next) {
   });
 
   var userArticlesSaved = await newUserArticle.save();
-  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
 
-  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+  var userToken = req.body.user.token;
+  var searchUser = await userModel.updateOne(
+    { token: userToken },
+    { $push: { userArticles: articleID } }
+  );
 
-  // var user = await userModel.findById(userID).populate("userJourneys").exec();
-  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
-
-  res.json(userArticlesSaved);
+  res.json({ userArticlesSaved });
 });
 
+//---------------SUPPRIMER UN ARTICLE DE MYARTICLES-----------------------
+
 //---------------ROUTE VOIR TOUS LES ARTICLES EN GET SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
-// router.get("/screenMyarticles", async function (req, res, next) {
-// console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
-
-// console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
-
-// var user = await userModel.findById(userID).populate("userJourneys").exec();
-//  console.log("req.session.userSaved.userJourneys", user.userJourneys)
-
-// res.render("screenMyarticles", { userJourneys: user.userJourneys });
-// });
+router.get('/myarticles', async function (req, res, next) {
+  var userID = req.body.user._id;
+  var userToken = req.body.user.token;
+  var userTest = await userModel
+    .findById(userID)
+    .populate('userArticles')
+    .exec();
+  var tab = [];
+  for (var i = 0; i < userTest.userArticles.length; i++) {
+    var article = await ArticleModel.findById(userTest.userArticles[i]);
+    tab.push(article);
+  }
+  res.json({ userToken, userArticles: tab });
+});
 
 module.exports = router;
