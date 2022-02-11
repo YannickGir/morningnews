@@ -80,4 +80,52 @@ router.post("/sign-in", async function (req, res, next) {
   res.json({ result, user, error, token });
 });
 
+//---------------ROUTE EN GET POUR SAUV EN BDD MY ARTICLES DEPUIS SCREENARTICLESBYSOURCE-----------------------
+router.get("/screenMyarticles", async function (req, res, next) {
+  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
+
+  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+
+  var user = await userModel.findById(userID).populate("userJourneys").exec();
+  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
+
+  res.render("screenMyarticles", { userJourneys: user.userJourneys });
+});
+
+//---------------ROUTE EN GET SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
+router.get("/screenMyarticles", async function (req, res, next) {
+  var newUserJourney = new journeyModel([
+    {
+      _id: req.session.journeyticketsArray[i].id,
+      departure: req.session.journeyticketsArray[i].departure,
+      arrival: req.session.journeyticketsArray[i].arrival,
+      date: req.session.journeyticketsArray[i].date,
+      departureTime: req.session.journeyticketsArray[i].departureTime,
+      price: req.session.journeyticketsArray[i].price,
+    },
+  ]);
+
+  var userArticlesSaved = await newUserJourney.save();
+  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
+
+  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+
+  var user = await userModel.findById(userID).populate("userJourneys").exec();
+  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
+
+  res.render("screenMyarticles", { userJourneys: user.userJourneys });
+});
+
+//---------------ROUTE VOIR TOUS LES ARTICLES EN GET SAUV EN BDD DEPUIS SCREENMYARTICLES-----------------------
+router.get("/screenMyarticles", async function (req, res, next) {
+  // console.log(" req.session.articleSaved",  req.session.userSaved.userJourneys)
+
+  // console.log(" req.session.userSaved.userJourneys",  req.session.userSaved.userJourneys)
+
+  var user = await userModel.findById(userID).populate("userJourneys").exec();
+  //  console.log("req.session.userSaved.userJourneys", user.userJourneys)
+
+  res.render("screenMyarticles", { userJourneys: user.userJourneys });
+});
+
 module.exports = router;

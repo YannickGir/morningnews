@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+
 import "./App.css";
 import { Card, Icon, Modal } from "antd";
 import Nav from "./Nav";
@@ -98,7 +99,8 @@ function ScreenArticlesBySource(props) {
 function mapDispatchToProps(dispatch) {
   return {
     addToWishList: function (article) {
-      dispatch({ type: "addArticle", articleLiked: article });
+      dispatch({ type: "addArticle", articleLiked: article }); // ajout dans wih front et envoi au store
+      //envoi en BDD par la route en GET
     },
   };
 }
