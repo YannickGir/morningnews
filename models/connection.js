@@ -1,16 +1,18 @@
-var mongoose = require('mongoose');
+var mongoose = require("mongoose");
 
 var options = {
-    connectTimeoutMS: 5000,
-    useUnifiedTopology : true,
-    useNewUrlParser: true,
-}
-
-mongoose.connect('mongodb+srv://david:hgm4lRQq8QM1p3P8@cluster0-9xbpy.mongodb.net/morningnews?retryWrites=true&w=majority',
-    options,
-    function(err){
-        console.log(err);
+  connectTimeoutMS: 5000,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+};
+mongoose.connect(
+  "mongodb+srv://Yannick:yannick@cluster0.rhyjx.mongodb.net/morningnews?retryWrites=true&w=majority",
+  options,
+  function (error) {
+    if (error == null) {
+      console.log("Connexion à la base de donnée réussie");
+    } else {
+      console.log(error);
     }
-)
-
-module.exports = mongoose
+  }
+);
